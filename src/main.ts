@@ -96,18 +96,14 @@ class Board {
 
     if (data === 'queen') {
       if (!square.querySelector('.queen-image')) {
-        const alignDiv = document.createElement('div')
-        alignDiv.style.position = 'relative'
-        alignDiv.style.height = '100%'
-
         const queen = document.createElement('img')
 
-        alignDiv.appendChild(queen)
         queen.src = './q.png'
         queen.className = 'queen-image'
         queen.draggable = true
 
         queen.style.position = 'absolute'
+        queen.style.transform = 'translate(8%, 8%)'
         queen.style.zIndex = '20'
 
         queen.addEventListener('dragstart', (dragEvent) => {
@@ -119,7 +115,7 @@ class Board {
           queen.classList.remove('dragging')
         })
 
-        square.appendChild(alignDiv)
+        square.appendChild(queen)
 
         // Update stock
         const stockSpan = document.getElementById('stock')
