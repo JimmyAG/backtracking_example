@@ -24,6 +24,9 @@ class Board {
     this.boardLetters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
   }
 
+  checkBoardMatrix() {}
+  updateBoardMatrix(square: HTMLDivElement) {}
+
   setBoardCoordinations(column: number, row: number) {
     const squareColour =
       (row + (column + 1)) % 2 === 0
@@ -93,7 +96,9 @@ class Board {
   dropQueenOnBoard(e: DragEvent, square: HTMLDivElement) {
     e.preventDefault()
     const data = e.dataTransfer?.getData('text/plain')
+    const originParentId = e.dataTransfer?.getData('origin-parent')
 
+    console.log('square id: ', square.id)
     if (data === 'queen') {
       if (!square.querySelector('.queen-image')) {
         const queen = document.createElement('img')
@@ -108,6 +113,7 @@ class Board {
 
         queen.addEventListener('dragstart', (dragEvent) => {
           dragEvent.dataTransfer?.setData('text/plain', 'queen-from-board')
+          dragEvent.dataTransfer?.setData('origin-parent', square.id)
           queen.classList.add('dragging')
         })
 
@@ -125,15 +131,32 @@ class Board {
           stock--
           stockSpan.textContent = stock.toString()
           const stockQueen = document.getElementById('draggable-queen')
+
           if (stock === 0 && stockQueen) {
             stockQueen.style.display = 'none'
           }
         }
+
+        // Update Matrix
+        const row = Math.abs(parseInt(square.id[1]) - 8)
+        const column = this.boardLetters.indexOf(square.id[0])
+        console.log(row, column)
+        this.boardMatrix[row][column] = 'Q'
       }
     } else if (data === 'queen-from-board') {
       const draggingQueen = document.querySelector('.dragging')
+      const originParentId = e.dataTransfer?.getData('origin-parent') as string
+
       if (draggingQueen && !square.querySelector('.queen-image')) {
         square.appendChild(draggingQueen)
+
+        const originalRow = Math.abs(parseInt(originParentId[1]) - 8)
+        const originalColumn = this.boardLetters.indexOf(originParentId[0])
+        this.boardMatrix[originalRow][originalColumn] = ''
+
+        const row = Math.abs(parseInt(square.id[1]) - 8)
+        const column = this.boardLetters.indexOf(square.id[0])
+        this.boardMatrix[row][column] = 'Q'
       }
     }
   }
@@ -147,20 +170,10 @@ class Board {
     const stockQueen = document.getElementById('draggable-queen')
     const stockArea = document.getElementById('stock-area')
 
-    if (stockQueen) {
+    if (stockQueen)
       stockQueen.addEventListener('dragstart', (e) => {
         e.dataTransfer?.setData('text/plain', 'queen')
       })
-    } else {
-      const queenImage = document.createElement('img')
-      queenImage.id = 'draggable-queen'
-      queenImage.className = 'queen-image'
-      queenImage.draggable = true
-      queenImage.src = './q.png'
-      queenImage.style.display = 'inline'
-
-      if (stockArea) stockArea.appendChild(queenImage)
-    }
 
     if (stockQueensNumber) stockQueensNumber.innerText = '8'
 
@@ -192,6 +205,11 @@ class Board {
             square.addEventListener('drop', (e) =>
               this.dropQueenOnBoard(e, square)
             )
+
+            square.addEventListener('dragstart', (dragEvent) => {
+              dragEvent.dataTransfer?.setData('text/plain', 'queen-from-board')
+              dragEvent.dataTransfer?.setData('origin-parent', square.id)
+            })
           }
 
           newRank.appendChild(square)
