@@ -24,7 +24,91 @@ class Board {
     this.boardLetters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
   }
 
-  checkBoardMatrix() {}
+  checkColumn(column: number) {
+    for (let i = 0; i < this.boardMatrix.length; i++) {
+      if (this.boardMatrix[i][column] === 'Q') {
+        return false
+      }
+    }
+
+    return true
+  }
+
+  checkDiagonals(row: number, column: number) {
+    const n = this.boardMatrix.length
+
+    // Check positive diagonal (top-left to bottom-right)
+    let i = row - 1
+    let j = column - 1
+    while (i >= 0 && j >= 0) {
+      if (this.boardMatrix[i][j] === 'Q') {
+        return false
+      }
+      i--
+      j--
+    }
+
+    i = row + 1
+    j = column + 1
+    while (i < n && j < n) {
+      if (this.boardMatrix[i][j] === 'Q') {
+        return false
+      }
+      i++
+      j++
+    }
+
+    // Check negative diagonal (top-right to bottom-left)
+    i = row - 1
+    j = column + 1
+    while (i >= 0 && j < n) {
+      if (this.boardMatrix[i][j] === 'Q') {
+        return false
+      }
+      i--
+      j++
+    }
+
+    i = row + 1
+    j = column - 1
+    while (i < n && j >= 0) {
+      if (this.boardMatrix[i][j] === 'Q') {
+        return false
+      }
+      i++
+      j--
+    }
+
+    return true
+  }
+
+  getIdFromMatrixCoords(row: number, column: number) {
+    return `${this.boardLetters[column]}${row + 1}`
+  }
+
+  getMatrixCoordsFromSquare(squareId: string) {
+    const row = Math.abs(parseInt(squareId[1]) - 8)
+    const column = this.boardLetters.indexOf(squareId[0])
+
+    return { row, column }
+  }
+
+  isValidSquare(squareId: string) {
+    // For some reason dragging over the same square the drag started from returns ''
+    // so we check if it is not the same square are dragging the queen from
+    if (squareId !== '') {
+      const coords = this.getMatrixCoordsFromSquare(squareId)
+      const isValidCol = this.checkColumn(coords.column)
+      const isValidRow = !this.boardMatrix[coords.row].includes('Q')
+      const validDiagonals = this.checkDiagonals(coords.row, coords.column)
+
+      if (isValidCol && isValidRow && validDiagonals) {
+        console.log('available')
+      }
+    }
+  }
+
+  // checkBoardMatrix() {}
   updateBoardMatrix(square: HTMLDivElement) {}
 
   setBoardCoordinations(column: number, row: number) {
@@ -33,9 +117,8 @@ class Board {
         ? this.darkSqaurColor
         : this.lightSqaurColor
 
-    const square = document.getElementById(
-      `${this.boardLetters[column]}${row + 1}`
-    )
+    const squareId = this.getIdFromMatrixCoords(row + 1, column)
+    const square = document.getElementById(squareId)
 
     if (column === 7) {
       const squareNumber = document.createElement('p')
@@ -96,9 +179,8 @@ class Board {
   dropQueenOnBoard(e: DragEvent, square: HTMLDivElement) {
     e.preventDefault()
     const data = e.dataTransfer?.getData('text/plain')
-    const originParentId = e.dataTransfer?.getData('origin-parent')
+    const originParentId = e.dataTransfer?.getData('origin-parent') as string
 
-    console.log('square id: ', square.id)
     if (data === 'queen') {
       if (!square.querySelector('.queen-image')) {
         const queen = document.createElement('img')
@@ -138,27 +220,24 @@ class Board {
         }
 
         // Update Matrix
-        const row = Math.abs(parseInt(square.id[1]) - 8)
-        const column = this.boardLetters.indexOf(square.id[0])
-        console.log(row, column)
-        this.boardMatrix[row][column] = 'Q'
+        const coords = this.getMatrixCoordsFromSquare(square.id)
+        this.boardMatrix[coords.row][coords.column] = 'Q'
       }
     } else if (data === 'queen-from-board') {
       const draggingQueen = document.querySelector('.dragging')
-      const originParentId = e.dataTransfer?.getData('origin-parent') as string
 
       if (draggingQueen && !square.querySelector('.queen-image')) {
         square.appendChild(draggingQueen)
 
-        const originalRow = Math.abs(parseInt(originParentId[1]) - 8)
-        const originalColumn = this.boardLetters.indexOf(originParentId[0])
-        this.boardMatrix[originalRow][originalColumn] = ''
+        const originalCoords = this.getMatrixCoordsFromSquare(originParentId)
+        this.boardMatrix[originalCoords.row][originalCoords.column] = ''
 
-        const row = Math.abs(parseInt(square.id[1]) - 8)
-        const column = this.boardLetters.indexOf(square.id[0])
-        this.boardMatrix[row][column] = 'Q'
+        const newCoords = this.getMatrixCoordsFromSquare(square.id)
+        this.boardMatrix[newCoords.row][newCoords.column] = 'Q'
       }
     }
+
+    // console.log(this.boardMatrix)
   }
 
   init() {
@@ -192,16 +271,23 @@ class Board {
           square.style.display = 'flex'
           square.style.flexDirection = 'column'
 
-          square.id = `${this.boardLetters[column]}${row + 1}`
+          square.id = this.getIdFromMatrixCoords(row, column) //`${this.boardLetters[column]}${row + 1}`
 
           square.className =
             (row + (column + 1)) % 2 === 0 ? 'light-square' : 'dark-square'
 
-          if (freePlayCheckbox && freePlayCheckbox.checked) {
-            square.addEventListener('dragover', (e) => {
-              e.preventDefault()
-            })
+          square.addEventListener('dragover', (e) => {
+            e.preventDefault()
+            const targetSquareId = (e.target as any).id
 
+            this.isValidSquare(targetSquareId)
+          })
+
+          square.addEventListener('dragleave', (e) => {
+            e.preventDefault()
+          })
+
+          if (freePlayCheckbox && freePlayCheckbox.checked) {
             square.addEventListener('drop', (e) =>
               this.dropQueenOnBoard(e, square)
             )
@@ -221,7 +307,6 @@ class Board {
     if (stockArea) {
       stockArea.addEventListener('dragover', (e) => {
         e.preventDefault()
-        stockArea.style.borderStyle = 'dotted'
       })
 
       stockArea.addEventListener('drop', (e) => this.dropQueenOnStockArea(e))
