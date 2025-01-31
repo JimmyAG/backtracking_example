@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES6", // Specify the target JavaScript version (e.g., ES5, ES6, etc.)
+    "target": "ES2017", // Specify the target JavaScript version (e.g., ES5, ES6, etc.)
     "module": "ES6", // Specify the module system (e.g., CommonJS, ES6, etc.)
     "strict": true, // Enable all strict type-checking options
     "esModuleInterop": true, // Enable compatibility with ES modules
