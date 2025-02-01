@@ -295,6 +295,9 @@ class Board {
             square.addEventListener('dragstart', (dragEvent) => {
               dragEvent.dataTransfer?.setData('text/plain', 'queen-from-board')
               dragEvent.dataTransfer?.setData('origin-parent', square.id)
+
+              const originalCoords = this.getMatrixCoordsFromSquare(square.id)
+              this.boardMatrix[originalCoords.row][originalCoords.column] = ''
             })
           }
 
