@@ -102,8 +102,19 @@ class Board {
       const isValidRow = !this.boardMatrix[coords.row].includes('Q')
       const validDiagonals = this.checkDiagonals(coords.row, coords.column)
 
+      // if (isValidCol && isValidRow && validDiagonals) {
+      //   console.log('available')
+      // }
+
       if (isValidCol && isValidRow && validDiagonals) {
-        console.log('available')
+        console.log('Available', squareId)
+      } else {
+        const square = document.getElementById(squareId)
+        console.log('Not Available', squareId)
+        if (square) {
+          square.style.backgroundColor = 'red'
+          square.style.opacity = '0.5'
+        }
       }
     }
   }
@@ -117,7 +128,7 @@ class Board {
         ? this.darkSqaurColor
         : this.lightSqaurColor
 
-    const squareId = this.getIdFromMatrixCoords(row + 1, column)
+    const squareId = this.getIdFromMatrixCoords(row, column)
     const square = document.getElementById(squareId)
 
     if (column === 7) {
@@ -131,22 +142,16 @@ class Board {
     }
 
     if (row === 0) {
-      const alignDiv = document.createElement('div')
-      alignDiv.style.position = 'relative'
-      alignDiv.style.height = '100%'
-
       const squareLetter = document.createElement('p')
-
-      alignDiv.appendChild(squareLetter)
 
       squareLetter.innerHTML = this.boardLetters[column]
       squareLetter.style.color = squareColour
-      squareLetter.style.position = 'absolute'
 
       squareLetter.style.bottom = '1px'
       squareLetter.style.marginLeft = '4px'
+      squareLetter.style.marginTop = 'auto'
 
-      square?.appendChild(alignDiv)
+      square?.appendChild(squareLetter)
     }
   }
 
