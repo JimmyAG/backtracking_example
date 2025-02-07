@@ -1,18 +1,16 @@
 const initButton = document.getElementById('start-button')
 
 class Board {
-  private readonly rows: number
   private readonly columns: number
   private readonly boardLetters: string[]
   private readonly lightSqaurColor: string = '#f0d9b5'
   private readonly darkSqaurColor: string = '#b58863'
   private readonly boardMatrix: string[][] = [[]]
   private readonly solutions: string[][][]
-  private solutionFound = false
+  private solutionFound: boolean = false
 
   //constructor function
   constructor(rows: number) {
-    this.rows = rows
     this.columns = rows
     this.boardLetters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
     this.boardMatrix = Array.from({ length: this.columns }, () =>
@@ -23,10 +21,7 @@ class Board {
 
   solver(row: number) {
     if (row === this.columns) {
-      // console.log('final', this.boardMatrix)
       this.solutions.push(this.boardMatrix.map((row) => [...row]))
-      console.log('final', JSON.stringify(this.boardMatrix))
-
       this.solutionFound = true
 
       return
@@ -39,17 +34,13 @@ class Board {
 
       if (this.isValidSquare(squareId)) {
         // console.log(row, col)
-        console.log(`Placing Q at row ${row}, col ${col}`)
         this.boardMatrix[row][col] = 'Q'
-        console.log(JSON.parse(JSON.stringify(this.boardMatrix)))
 
         this.solver(row + 1)
 
-        // if (this.solutionFound) return
+        if (this.solutionFound) return
 
-        console.log(`Backtracking from row ${row}, col ${col}`)
         this.boardMatrix[row][col] = ''
-        console.log(JSON.parse(JSON.stringify(this.boardMatrix)))
       }
     }
   }
