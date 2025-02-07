@@ -5,8 +5,8 @@ class Board {
   private readonly boardLetters: string[]
   private readonly lightSqaurColor: string = '#f0d9b5'
   private readonly darkSqaurColor: string = '#b58863'
-  private readonly boardMatrix: string[][] = [[]]
   private readonly solutions: string[][][]
+  private boardMatrix: string[][] = [[]]
   private solutionFound: boolean = false
 
   //constructor function
@@ -327,6 +327,10 @@ class Board {
           })
 
           if (freePlayCheckbox && freePlayCheckbox.checked) {
+            this.boardMatrix = Array.from({ length: this.columns }, () =>
+              Array.from({ length: this.columns }, () => '')
+            )
+
             square.addEventListener('drop', (e) =>
               this.dropQueenOnBoard(e, square)
             )
