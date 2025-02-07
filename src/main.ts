@@ -7,6 +7,8 @@ class Board {
   private readonly lightSqaurColor: string = '#f0d9b5'
   private readonly darkSqaurColor: string = '#b58863'
   private readonly boardMatrix: string[][] = [[]]
+  private readonly solutions: string[][][]
+  private solutionFound = false
 
   //constructor function
   constructor(rows: number) {
@@ -16,6 +18,40 @@ class Board {
     this.boardMatrix = Array.from({ length: this.columns }, () =>
       Array.from({ length: this.columns }, () => '')
     )
+    this.solutions = []
+  }
+
+  solver(row: number) {
+    if (row === this.columns) {
+      // console.log('final', this.boardMatrix)
+      this.solutions.push(this.boardMatrix.map((row) => [...row]))
+      console.log('final', JSON.stringify(this.boardMatrix))
+
+      this.solutionFound = true
+
+      return
+    }
+
+    for (let col = 0; col < this.columns; col++) {
+      const squareId = `${this.boardLetters[col]}${Math.abs(
+        row - this.columns
+      )}`
+
+      if (this.isValidSquare(squareId)) {
+        // console.log(row, col)
+        console.log(`Placing Q at row ${row}, col ${col}`)
+        this.boardMatrix[row][col] = 'Q'
+        console.log(JSON.parse(JSON.stringify(this.boardMatrix)))
+
+        this.solver(row + 1)
+
+        // if (this.solutionFound) return
+
+        console.log(`Backtracking from row ${row}, col ${col}`)
+        this.boardMatrix[row][col] = ''
+        console.log(JSON.parse(JSON.stringify(this.boardMatrix)))
+      }
+    }
   }
 
   checkColumn(column: number) {
@@ -104,10 +140,12 @@ class Board {
       //     .map((line) => (!line.includes('//') ? line.trim() : undefined))
       // )
       if (isValidCol && isValidRow && validDiagonals) {
+        // console.log('Available', squareId)
         return true
       } else {
         const square = document.getElementById(squareId)
-        console.log('Not Available', squareId)
+        // console.log('Not Available', squareId)
+
         if (square) {
           square.style.backgroundColor = 'red'
           square.style.opacity = '0.5'
@@ -261,6 +299,9 @@ class Board {
       })
 
     if (stockQueensNumber) stockQueensNumber.innerText = `${this.columns}`
+
+    this.solver(0)
+    console.log(this.solutions)
 
     if (chessBoardEl) {
       chessBoardEl.style.width = 'min-content'
