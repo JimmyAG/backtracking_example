@@ -81,7 +81,7 @@ class Board {
   }
 
   getMatrixCoordsFromSquare(squareId: string) {
-    const row = Math.abs(parseInt(squareId[1]) - 8)
+    const row = Math.abs(parseInt(squareId[1]) - this.columns)
     const column = this.boardLetters.indexOf(squareId[0])
 
     return { row, column }
@@ -130,7 +130,7 @@ class Board {
     const squareId = this.getIdFromMatrixCoords(row, column)
     const square = document.getElementById(squareId)
 
-    if (column === 7) {
+    if (column === this.columns - 1) {
       const squareNumber = document.createElement('p')
       squareNumber.innerHTML = `${row + 1}`
       squareNumber.style.color = squareColour
@@ -260,12 +260,13 @@ class Board {
         e.dataTransfer?.setData('text/plain', 'queen')
       })
 
-    if (stockQueensNumber) stockQueensNumber.innerText = '8'
+    if (stockQueensNumber) stockQueensNumber.innerText = `${this.columns}`
 
     if (chessBoardEl) {
+      chessBoardEl.style.width = 'min-content'
       chessBoardEl.style.border = 'solid 5px black'
 
-      for (let row = 7; row >= 0; row--) {
+      for (let row = this.columns - 1; row >= 0; row--) {
         const newRank = document.createElement('div')
         newRank.style.display = 'flex'
         chessBoardEl.appendChild(newRank)
@@ -324,11 +325,17 @@ class Board {
 }
 
 initButton?.addEventListener('click', () => {
+  const NofQueensElement = document.getElementById(
+    'set-queen-number'
+  ) as HTMLInputElement
+  const selectedQueenNumber = parseInt(NofQueensElement.value)
+
   let chessBoard = document.getElementById('chess-board')
+
   if (chessBoard) {
     chessBoard.innerHTML = ''
 
-    let newChessBoard = new Board(8)
+    let newChessBoard = new Board(selectedQueenNumber)
 
     newChessBoard.init()
   }

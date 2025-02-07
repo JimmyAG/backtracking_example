@@ -29,6 +29,16 @@
             <div class="flex items-center gap-3">
               <label for="free-play">Free play</label>
               <input id="free-play" type="checkbox" aria-label="free-play" />
+
+              <label> number of queens </label>
+              <input
+                class="w-12 border py-1 pl-2 pr-1 rounded-md"
+                id="set-queen-number"
+                type="number"
+                min="4"
+                max="8"
+                value="4"
+              />
             </div>
             <button
               class="border rounded-md p-2 bg-gray-100 w-24"
@@ -38,7 +48,7 @@
             </button>
             <div id="stock-area" class="flex gap-2 w-48">
               <p>Remaining Queens:</p>
-              <span id="stock">8</span>
+              <span id="stock">??</span>
               <img
                 id="draggable-queen"
                 class="queen-image"
@@ -47,7 +57,7 @@
               />
             </div>
           </div>
-          <div id="chess-board" class="mt-3"></div>
+          <div id="chess-board" class="mt-3 w-fit"></div>
         </div>
         <!-- Stack -->
         <div class="stack-panel flex flex-col border rounded-md p-3">Stack</div>
