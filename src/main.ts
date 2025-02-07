@@ -6,22 +6,16 @@ class Board {
   private readonly boardLetters: string[]
   private readonly lightSqaurColor: string = '#f0d9b5'
   private readonly darkSqaurColor: string = '#b58863'
-  private readonly boardMatrix: string[][] = [
-    ['', '', '', '', '', '', '', ''],
-    ['', '', '', '', '', '', '', ''],
-    ['', '', '', '', '', '', '', ''],
-    ['', '', '', '', '', '', '', ''],
-    ['', '', '', '', '', '', '', ''],
-    ['', '', '', '', '', '', '', ''],
-    ['', '', '', '', '', '', '', ''],
-    ['', '', '', '', '', '', '', ''],
-  ]
+  private readonly boardMatrix: string[][] = [[]]
 
   //constructor function
   constructor(rows: number) {
     this.rows = rows
     this.columns = rows
     this.boardLetters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+    this.boardMatrix = Array.from({ length: this.columns }, () =>
+      Array.from({ length: this.columns }, () => '')
+    )
   }
 
   checkColumn(column: number) {
@@ -102,12 +96,15 @@ class Board {
       const isValidRow = !this.boardMatrix[coords.row].includes('Q')
       const validDiagonals = this.checkDiagonals(coords.row, coords.column)
 
-      // if (isValidCol && isValidRow && validDiagonals) {
-      //   console.log('available')
-      // }
-
+      // console.log(this.isValidSquare.toString().split('\n'))
+      // console.trace(
+      //   this.isValidSquare
+      //     .toString()
+      //     .split('\n')
+      //     .map((line) => (!line.includes('//') ? line.trim() : undefined))
+      // )
       if (isValidCol && isValidRow && validDiagonals) {
-        console.log('Available', squareId)
+        return true
       } else {
         const square = document.getElementById(squareId)
         console.log('Not Available', squareId)
@@ -116,6 +113,8 @@ class Board {
           square.style.opacity = '0.5'
         }
       }
+
+      return false
     }
   }
 
@@ -239,10 +238,12 @@ class Board {
 
         const newCoords = this.getMatrixCoordsFromSquare(square.id)
         this.boardMatrix[newCoords.row][newCoords.column] = 'Q'
+
+        this.boardMatrix[originalCoords.row][originalCoords.column] = ''
       }
     }
 
-    // console.log(this.boardMatrix)
+    console.log(this.boardMatrix)
   }
 
   init() {
