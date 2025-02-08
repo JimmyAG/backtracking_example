@@ -4,17 +4,62 @@ class Board {
   private readonly lightSqaurColor: string = '#f0d9b5'
   private readonly darkSqaurColor: string = '#b58863'
   private readonly solutions: string[][][]
+  private readonly delay: number = 1000
   private solutionFound: boolean = false
   public boardMatrix: string[][] = [[]]
 
   //constructor function
-  constructor(rows: number) {
+  constructor(delay: number, rows: number) {
+    this.delay = delay
     this.columns = rows
     this.boardLetters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
     this.boardMatrix = Array.from({ length: this.columns }, () =>
       Array.from({ length: this.columns }, () => '')
     )
     this.solutions = []
+  }
+
+  addCallToStack(row: number, col: number) {
+    const NofQueensElement = document.getElementById(
+      'set-queen-number'
+    ) as HTMLInputElement
+    const selectedQueenNumber = parseInt(NofQueensElement.value)
+
+    const functionCall = document.createElement('div')
+    functionCall.id = this.getIdFromMatrixCoords(row || 0, col || 0)
+    functionCall.style.width = 'auto'
+    functionCall.style.height = '60px'
+    functionCall.style.background = 'yellow'
+    functionCall.classList.add('flex-shrink-0')
+    functionCall.textContent = `Solver(), row: ${row || ''}, col: ${col || ''}`
+    const stackElement = document.getElementById('stack')
+
+    if (stackElement) {
+      stackElement.appendChild(functionCall)
+
+      switch (selectedQueenNumber) {
+        case 8:
+          stackElement.style.maxHeight = '630px'
+          break
+
+        case 7:
+          stackElement.style.maxHeight = '560px'
+          break
+
+        case 6:
+          stackElement.style.maxHeight = '490px'
+          break
+
+        case 5:
+          stackElement.style.maxHeight = '440px'
+          break
+
+        default:
+          console.log('s')
+          stackElement.style.maxHeight = '360px'
+          break
+      }
+    }
   }
 
   createQueenImage(imageSrc: string) {
@@ -51,8 +96,9 @@ class Board {
 
         square?.appendChild(queenImage)
 
-        await new Promise((resolve) => setTimeout(resolve, 500))
+        await new Promise((resolve) => setTimeout(resolve, this.delay))
 
+        this.addCallToStack(row + 1, col + 1)
         await this.solver(row + 1)
 
         if (this.solutionFound) return
@@ -65,7 +111,7 @@ class Board {
           const angryQueenImage = this.createQueenImage('./q-angry.png')
           square.appendChild(angryQueenImage)
 
-          await new Promise((resolve) => setTimeout(resolve, 500))
+          await new Promise((resolve) => setTimeout(resolve, this.delay))
 
           this.clearHighlights()
           square.removeChild(angryQueenImage)
@@ -388,6 +434,7 @@ class Board {
     }
   }
 }
+
 const initButton = document.getElementById('start-button')
 const solveButton = document.getElementById('solve-button')
 let chessBoard = document.getElementById('chess-board')
@@ -397,19 +444,20 @@ initButton?.addEventListener('click', () => {
   const NofQueensElement = document.getElementById(
     'set-queen-number'
   ) as HTMLInputElement
+  const delayInputElement = document.getElementById('delay') as HTMLInputElement
+  const dealyInMs = parseInt(delayInputElement.value)
   const selectedQueenNumber = parseInt(NofQueensElement.value)
 
   if (chessBoard) {
     chessBoard.innerHTML = ''
 
-    gameClass = new Board(selectedQueenNumber)
+    gameClass = new Board(dealyInMs, selectedQueenNumber)
 
     gameClass.init()
   }
 })
 
 solveButton?.addEventListener('click', async () => {
-  console.log(gameClass)
   if (chessBoard && gameClass) {
     await gameClass.solver(0)
     console.log(gameClass.boardMatrix)
