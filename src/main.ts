@@ -1,13 +1,11 @@
-const initButton = document.getElementById('start-button')
-
 class Board {
   private readonly columns: number
   private readonly boardLetters: string[]
   private readonly lightSqaurColor: string = '#f0d9b5'
   private readonly darkSqaurColor: string = '#b58863'
   private readonly solutions: string[][][]
-  private boardMatrix: string[][] = [[]]
   private solutionFound: boolean = false
+  public boardMatrix: string[][] = [[]]
 
   //constructor function
   constructor(rows: number) {
@@ -19,7 +17,21 @@ class Board {
     this.solutions = []
   }
 
-  solver(row: number) {
+  createQueenImage(imageSrc: string) {
+    const queen = document.createElement('img')
+
+    queen.src = imageSrc // './q.png'
+    queen.className = 'queen-image'
+    queen.draggable = true
+
+    queen.style.position = 'absolute'
+    queen.style.transform = 'translate(8%, 8%)'
+    queen.style.zIndex = '20'
+
+    return queen
+  }
+
+  async solver(row: number) {
     if (row === this.columns) {
       this.solutions.push(this.boardMatrix.map((row) => [...row]))
       this.solutionFound = true
@@ -31,16 +43,33 @@ class Board {
       const squareId = `${this.boardLetters[col]}${Math.abs(
         row - this.columns
       )}`
+      const square = document.getElementById(squareId)
 
       if (this.isValidSquare(squareId)) {
-        // console.log(row, col)
         this.boardMatrix[row][col] = 'Q'
+        const queenImage = this.createQueenImage('./q.png')
 
-        this.solver(row + 1)
+        square?.appendChild(queenImage)
+
+        await new Promise((resolve) => setTimeout(resolve, 500))
+
+        await this.solver(row + 1)
 
         if (this.solutionFound) return
 
         this.boardMatrix[row][col] = ''
+        square?.removeChild(queenImage)
+      } else {
+        if (square) {
+          square.classList.add('highlight')
+          const angryQueenImage = this.createQueenImage('./q-angry.png')
+          square.appendChild(angryQueenImage)
+
+          await new Promise((resolve) => setTimeout(resolve, 500))
+
+          this.clearHighlights()
+          square.removeChild(angryQueenImage)
+        }
       }
     }
   }
@@ -151,9 +180,6 @@ class Board {
     return false
   }
 
-  // checkBoardMatrix() {}
-  updateBoardMatrix(square: HTMLDivElement) {}
-
   setBoardCoordinations(column: number, row: number) {
     const squareColour =
       (row + (column + 1)) % 2 === 0
@@ -220,15 +246,7 @@ class Board {
 
     if (data === 'queen') {
       if (!square.querySelector('.queen-image')) {
-        const queen = document.createElement('img')
-
-        queen.src = './q.png'
-        queen.className = 'queen-image'
-        queen.draggable = true
-
-        queen.style.position = 'absolute'
-        queen.style.transform = 'translate(8%, 8%)'
-        queen.style.zIndex = '20'
+        const queen = this.createQueenImage('./q.png')
 
         queen.addEventListener('dragstart', (dragEvent) => {
           dragEvent.dataTransfer?.setData('text/plain', 'queen-from-board')
@@ -276,7 +294,7 @@ class Board {
       }
     }
 
-    console.log(this.boardMatrix)
+    // console.log(this.boardMatrix)
   }
 
   init() {
@@ -295,9 +313,6 @@ class Board {
 
     if (stockQueensNumber) stockQueensNumber.innerText = `${this.columns}`
 
-    this.solver(0)
-    console.log(this.solutions)
-
     if (chessBoardEl) {
       chessBoardEl.style.width = 'min-content'
       chessBoardEl.style.border = 'solid 5px black'
@@ -314,16 +329,18 @@ class Board {
           square.style.display = 'flex'
           square.style.flexDirection = 'column'
 
-          square.id = this.getIdFromMatrixCoords(row, column) //`${this.boardLetters[column]}${row + 1}`
+          square.id = this.getIdFromMatrixCoords(row, column)
 
           square.className =
             (row + (column + 1)) % 2 === 0 ? 'light-square' : 'dark-square'
 
           square.addEventListener('dragover', (e) => {
             e.preventDefault()
-            const targetSquareId = (e.target as any).id
+            if (freePlayCheckbox.checked) {
+              const targetSquareId = (e.target as any).id
 
-            this.isValidSquare(targetSquareId)
+              this.isValidSquare(targetSquareId)
+            }
           })
 
           square.addEventListener('dragleave', (e) => {
@@ -336,16 +353,23 @@ class Board {
               Array.from({ length: this.columns }, () => '')
             )
 
-            square.addEventListener('drop', (e) =>
-              this.dropQueenOnBoard(e, square)
-            )
+            square.addEventListener('drop', (e) => {
+              if (freePlayCheckbox.checked) {
+                this.dropQueenOnBoard(e, square)
+              }
+            })
 
             square.addEventListener('dragstart', (dragEvent) => {
-              dragEvent.dataTransfer?.setData('text/plain', 'queen-from-board')
-              dragEvent.dataTransfer?.setData('origin-parent', square.id)
+              if (freePlayCheckbox.checked) {
+                dragEvent.dataTransfer?.setData(
+                  'text/plain',
+                  'queen-from-board'
+                )
+                dragEvent.dataTransfer?.setData('origin-parent', square.id)
 
-              const originalCoords = this.getMatrixCoordsFromSquare(square.id)
-              this.boardMatrix[originalCoords.row][originalCoords.column] = ''
+                const originalCoords = this.getMatrixCoordsFromSquare(square.id)
+                this.boardMatrix[originalCoords.row][originalCoords.column] = ''
+              }
             })
           }
 
@@ -364,6 +388,10 @@ class Board {
     }
   }
 }
+const initButton = document.getElementById('start-button')
+const solveButton = document.getElementById('solve-button')
+let chessBoard = document.getElementById('chess-board')
+let gameClass: Board
 
 initButton?.addEventListener('click', () => {
   const NofQueensElement = document.getElementById(
@@ -371,13 +399,19 @@ initButton?.addEventListener('click', () => {
   ) as HTMLInputElement
   const selectedQueenNumber = parseInt(NofQueensElement.value)
 
-  let chessBoard = document.getElementById('chess-board')
-
   if (chessBoard) {
     chessBoard.innerHTML = ''
 
-    let newChessBoard = new Board(selectedQueenNumber)
+    gameClass = new Board(selectedQueenNumber)
 
-    newChessBoard.init()
+    gameClass.init()
+  }
+})
+
+solveButton?.addEventListener('click', async () => {
+  console.log(gameClass)
+  if (chessBoard && gameClass) {
+    await gameClass.solver(0)
+    console.log(gameClass.boardMatrix)
   }
 })
