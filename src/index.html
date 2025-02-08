@@ -25,7 +25,7 @@
       <div class="flex gap-3">
         <!-- Chess board -->
         <div class="chess-panel flex flex-col border rounded-md p-3 w-full">
-          <div class="flex gap-6 w-96">
+          <div class="flex gap-6">
             <div class="flex items-center gap-3">
               <label for="free-play">Free play</label>
               <input id="free-play" type="checkbox" aria-label="free-play" />
@@ -55,6 +55,14 @@
                 draggable="true"
                 src="./q.png"
               />
+            </div>
+            <div>
+              <button
+                class="border rounded-md p-2 bg-gray-100 w-24"
+                id="solve-button"
+              >
+                Solve
+              </button>
             </div>
           </div>
           <div id="chess-board" class="mt-3 w-fit"></div>
