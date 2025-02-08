@@ -12,7 +12,8 @@
 
 .highlight {
   background-color: rgba(255, 0, 0, 0.5) !important;
-  opacity: 0.9;
+  opacity: 0.9 !important;
+  transition: background-color 0.3s ease-in-out;
 }
 
 .queen-image {
@@ -22,11 +23,11 @@
 }
 
 .chess-panel {
-  width: 600px;
+  width: 800px;
 }
 
 .stack-panel {
-  width: 310px;
+  width: 350px;
 }
 
 .dark-square {
