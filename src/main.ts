@@ -114,6 +114,13 @@ class Board {
     return { row, column }
   }
 
+  clearHighlights() {
+    const squares = document.querySelectorAll('.highlight')
+    squares.forEach((square) => {
+      square.classList.remove('highlight')
+    })
+  }
+
   isValidSquare(squareId: string) {
     // For some reason dragging over the same square the drag started from returns ''
     // so we check if it is not the same square are dragging the queen from
@@ -131,20 +138,17 @@ class Board {
       //     .map((line) => (!line.includes('//') ? line.trim() : undefined))
       // )
       if (isValidCol && isValidRow && validDiagonals) {
-        // console.log('Available', squareId)
         return true
       } else {
         const square = document.getElementById(squareId)
-        // console.log('Not Available', squareId)
 
         if (square) {
-          square.style.backgroundColor = 'red'
-          square.style.opacity = '0.5'
+          square.classList.add('highlight')
         }
       }
-
-      return false
     }
+
+    return false
   }
 
   // checkBoardMatrix() {}
@@ -324,6 +328,7 @@ class Board {
 
           square.addEventListener('dragleave', (e) => {
             e.preventDefault()
+            this.clearHighlights()
           })
 
           if (freePlayCheckbox && freePlayCheckbox.checked) {
