@@ -243,13 +243,6 @@ class Board {
       const isValidRow = !this.boardMatrix[coords.row].includes('Q')
       const validDiagonals = this.checkDiagonals(coords.row, coords.column)
 
-      // console.log(this.isValidSquare.toString().split('\n'))
-      // console.trace(
-      //   this.isValidSquare
-      //     .toString()
-      //     .split('\n')
-      //     .map((line) => (!line.includes('//') ? line.trim() : undefined))
-      // )
       if (isValidCol && isValidRow && validDiagonals) {
         return true
       } else {
