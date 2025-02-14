@@ -19,6 +19,10 @@ class Board {
     this.solutions = []
   }
 
+  async addDelay(delayInMs: number) {
+    return new Promise((resolve) => setTimeout(resolve, delayInMs))
+  }
+
   addCallToStack(row: number, col: number) {
     const NofQueensElement = document.getElementById(
       'set-queen-number'
@@ -31,11 +35,19 @@ class Board {
     functionCall.style.height = '60px'
     functionCall.style.background = 'yellow'
     functionCall.classList.add('flex-shrink-0')
-    functionCall.textContent = `Solver(), row: ${row || ''}, col: ${col || ''}`
+    functionCall.textContent = `Solver(${row}), row: ${row || ''}, col: ${
+      col || ''
+    }`
+    functionCall.classList.add('fade-in')
+
     const stackElement = document.getElementById('stack')
 
     if (stackElement) {
       stackElement.appendChild(functionCall)
+
+      requestAnimationFrame(() => {
+        functionCall.classList.add('fade-in')
+      })
 
       switch (selectedQueenNumber) {
         case 8:
@@ -55,7 +67,6 @@ class Board {
           break
 
         default:
-          console.log('s')
           stackElement.style.maxHeight = '360px'
           break
       }
@@ -77,6 +88,8 @@ class Board {
   }
 
   async solver(row: number) {
+    const stack = document.getElementById('stack')
+
     if (row === this.columns) {
       this.solutions.push(this.boardMatrix.map((row) => [...row]))
       this.solutionFound = true
@@ -91,27 +104,52 @@ class Board {
       const square = document.getElementById(squareId)
 
       if (this.isValidSquare(squareId)) {
+        await this.addDelay(this.delay / 3)
+
+        square?.classList.add('highlightGreen')
         this.boardMatrix[row][col] = 'Q'
         const queenImage = this.createQueenImage('./q.png')
 
+        await this.addDelay(this.delay)
+        square?.classList.remove('highlightGreen')
+
         square?.appendChild(queenImage)
 
-        await new Promise((resolve) => setTimeout(resolve, this.delay))
-
         this.addCallToStack(row + 1, col + 1)
+
+        await this.addDelay(this.delay)
+
         await this.solver(row + 1)
 
-        if (this.solutionFound) return
+        if (this.solutionFound) {
+          const lastElement = stack?.lastElementChild as HTMLElement
+          lastElement.classList.add('fade-out')
+          stack?.removeChild(lastElement)
+          await this.addDelay(this.delay / 2)
 
-        this.boardMatrix[row][col] = ''
+          return
+        }
+
+        this.boardMatrix[row][col] = '' // Backtrack
+
+        await this.addDelay(this.delay / 2)
+
         square?.removeChild(queenImage)
+
+        if (stack && stack.lastElementChild) {
+          const lastStackElement = stack.lastElementChild as HTMLElement
+          lastStackElement.classList.add('fade-out')
+          stack.removeChild(lastStackElement)
+        }
+
+        await this.addDelay(this.delay / 2)
       } else {
         if (square) {
           square.classList.add('highlight')
           const angryQueenImage = this.createQueenImage('./q-angry.png')
           square.appendChild(angryQueenImage)
 
-          await new Promise((resolve) => setTimeout(resolve, this.delay))
+          await this.addDelay(this.delay)
 
           this.clearHighlights()
           square.removeChild(angryQueenImage)
