@@ -16,6 +16,12 @@
   transition: background-color 0.3s ease-in-out;
 }
 
+.highlightGreen {
+  background-color: rgba(0, 180, 0, 0.5) !important;
+  opacity: 0.9 !important;
+  transition: background-color 0.3s ease-in-out;
+}
+
 .queen-image {
   width: 60px;
   height: 60px;
