@@ -89,6 +89,13 @@ class Board {
 
   async solver(row: number) {
     const stack = document.getElementById('stack')
+    const solveButton = document.getElementById(
+      'solve-button'
+    ) as HTMLInputElement
+
+    solveButton.disabled = true
+    solveButton.style.cursor = 'not-allowed'
+    solveButton.classList.add('cursor-not-allowed', 'opacity-50')
 
     if (row === this.columns) {
       this.solutions.push(this.boardMatrix.map((row) => [...row]))
@@ -110,14 +117,14 @@ class Board {
         this.boardMatrix[row][col] = 'Q'
         const queenImage = this.createQueenImage('./q.png')
 
-        await this.addDelay(this.delay)
+        if (this.delay > 0) await this.addDelay(this.delay)
         square?.classList.remove('highlightGreen')
 
         square?.appendChild(queenImage)
 
         this.addCallToStack(row + 1, col + 1)
 
-        await this.addDelay(this.delay)
+        if (this.delay > 0) await this.addDelay(this.delay)
 
         await this.solver(row + 1)
 
@@ -125,14 +132,14 @@ class Board {
           const lastElement = stack?.lastElementChild as HTMLElement
           lastElement.classList.add('fade-out')
           stack?.removeChild(lastElement)
-          await this.addDelay(this.delay / 2)
+          if (this.delay > 0) await this.addDelay(this.delay / 2)
 
           return
         }
 
         this.boardMatrix[row][col] = '' // Backtrack
 
-        await this.addDelay(this.delay / 2)
+        if (this.delay > 0) await this.addDelay(this.delay / 2)
 
         square?.removeChild(queenImage)
 
@@ -142,14 +149,14 @@ class Board {
           stack.removeChild(lastStackElement)
         }
 
-        await this.addDelay(this.delay / 2)
+        if (this.delay > 0) await this.addDelay(this.delay / 2)
       } else {
         if (square) {
           square.classList.add('highlight')
           const angryQueenImage = this.createQueenImage('./q-angry.png')
           square.appendChild(angryQueenImage)
 
-          await this.addDelay(this.delay)
+          if (this.delay > 0) await this.addDelay(this.delay)
 
           this.clearHighlights()
           square.removeChild(angryQueenImage)
@@ -467,7 +474,7 @@ class Board {
 }
 
 const initButton = document.getElementById('start-button')
-const solveButton = document.getElementById('solve-button')
+const solveButton = document.getElementById('solve-button') as HTMLInputElement
 let chessBoard = document.getElementById('chess-board')
 let gameClass: Board
 
@@ -485,6 +492,17 @@ initButton?.addEventListener('click', () => {
     gameClass = new Board(dealyInMs, selectedQueenNumber)
 
     gameClass.init()
+
+    if (solveButton) {
+      solveButton.disabled = false
+      solveButton.style.cursor = 'pointer'
+      solveButton.classList.remove('cursor-not-allowed', 'opacity-50')
+      solveButton.classList.add(
+        'hover:bg-gray-200',
+        'active:bg-gray-300',
+        'transition-all'
+      )
+    }
   }
 })
 
