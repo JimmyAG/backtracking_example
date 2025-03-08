@@ -29,11 +29,30 @@
 }
 
 .chess-panel {
-  width: 800px;
+  width: 600px;
 }
 
 .stack-panel {
-  width: 350px;
+  width: 200px;
+  background-color: #f8f9fa;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  font-family: Arial, sans-serif;
+}
+
+.stack-item {
+  background-color: #fffacd;
+  color: #000;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-weight: bold;
+  border-left: 4px solid #ffcc00;
+  margin-bottom: 5px;
+}
+
+.code-panel {
+  width: 600px;
 }
 
 .dark-square {
@@ -67,4 +86,8 @@ input[type='checkbox']::before {
 
 input[type='checkbox']:checked::before {
   transform: scale(1);
+}
+
+pre code {
+  white-space: pre-wrap;
 }
