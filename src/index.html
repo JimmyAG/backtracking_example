@@ -9,6 +9,12 @@
       rel="stylesheet"
     />
     <link href="./globals.css" rel="stylesheet" />
+    <link href="./code-styles.css" rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css"
+    />
+    <link href="./code-line-highlight.css" rel="stylesheet" />
   </head>
   <body>
     <h1 class="text-3xl font-bold mt-2 ml-2">
@@ -26,10 +32,28 @@
         <!-- Chess board -->
         <div class="chess-panel flex flex-col border rounded-md p-3 w-full">
           <div class="flex gap-5">
-            <div class="flex items-center gap-3">
-              <label for="free-play">Free play</label>
-              <input id="free-play" type="checkbox" aria-label="free-play" />
-
+            <div class="flex items-center gap-5">
+              <div id="stock-area" class="flex gap-2 w-48 flex-col">
+                <div class="flex flex-row gap-3">
+                  <label for="free-play">Free play</label>
+                  <input
+                    class="mt-1"
+                    id="free-play"
+                    type="checkbox"
+                    aria-label="free-play"
+                  />
+                </div>
+                <div class="flex flex-row gap-3">
+                  <p class="mt-2">Remaining Queens:</p>
+                  <span class="mt-4" id="stock">??</span>
+                  <img
+                    id="draggable-queen"
+                    class="queen-image"
+                    draggable="true"
+                    src="./q.png"
+                  />
+                </div>
+              </div>
               <div class="flex flex-col gap-2">
                 <div class="flex justify-between gap-2">
                   <label for="delay">Delay in ms:</label>
@@ -54,23 +78,13 @@
                 </div>
               </div>
             </div>
-            <button
-              class="border rounded-md p-2 w-24 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 transition-all"
-              id="start-button"
-            >
-              Start
-            </button>
-            <div id="stock-area" class="flex gap-2 w-48">
-              <p>Remaining Queens:</p>
-              <span id="stock">??</span>
-              <img
-                id="draggable-queen"
-                class="queen-image"
-                draggable="true"
-                src="./q.png"
-              />
-            </div>
             <div class="flex flex-col gap-2">
+              <button
+                class="border rounded-md p-2 w-24 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 transition-all"
+                id="start-button"
+              >
+                Start
+              </button>
               <button
                 class="border rounded-md p-2 w-24 bg-gray-100 cursor-not-allowed opacity-50"
                 disabled
@@ -83,17 +97,58 @@
           <div id="chess-board" class="mt-3 w-fit"></div>
         </div>
 
-        <!-- id="stack" -->
         <!-- Stack -->
-        <div class="stack-panel flex flex-col border rounded-md p-3 gap-2">
+        <div class="stack-panel">
           Stack
           <div
             id="stack"
-            class="flex flex-col-reverse gap-2 overflow-y-auto"
+            class="flex flex-col-reverse gap-2 overflow-y-auto pt-2"
           ></div>
+        </div>
+
+        <!-- Code -->
+        <div class="code-panel flex flex-col border rounded-md p-3 gap-2">
+          Code
+          <div
+            id="code"
+            class="relative flex flex-col-reverse gap-2 overflow-y-auto"
+          >
+            <pre
+              id="code-block"
+              class="line-numbers"
+              data-line=""
+            ><code class="language-typescript">async solver(row: number) {
+  if (row === this.columns) {
+    this.solutionFound = true;
+    return;
+  }
+
+  for (let col = 0; col &lt; this.columns; col++) {
+    const squareId = this.getIdFromMatrixCoords(
+        Math.abs(row + 1 - this.columns),
+        col)
+
+    if (this.isValidSquare(squareId)) {
+      this.boardMatrix[row][col] = 'Q';
+      await this.solver(row + 1);
+
+      if (this.solutionFound) {
+        return;
+      }
+
+      this.boardMatrix[row][col] = ''; // Backtrack
+    }
+  }
+}</code></pre>
+          </div>
         </div>
       </div>
     </div>
-    <script src="../dist/main.js"></script>
+    <script src="../dist/main.js" type="module"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/components/prism-typescript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-highlight/prism-line-highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+    <script src="_bundle.js"></script>
   </body>
 </html>
