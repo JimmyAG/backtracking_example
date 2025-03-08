@@ -1,3 +1,5 @@
+import { im } from './im'
+
 class Board {
   private readonly columns: number
   private readonly boardLetters: string[]
@@ -23,6 +25,57 @@ class Board {
     return new Promise((resolve) => setTimeout(resolve, delayInMs))
   }
 
+  setElementHeightBasedOnBoardSize(
+    htmlElement: HTMLElement,
+    numberOfQueens: number
+  ) {
+    if (htmlElement) {
+      switch (numberOfQueens) {
+        case 8:
+          htmlElement.style.maxHeight = '630px'
+          break
+
+        case 7:
+          htmlElement.style.maxHeight = '560px'
+          break
+
+        case 6:
+          htmlElement.style.maxHeight = '490px'
+          break
+
+        case 5:
+          htmlElement.style.maxHeight = '440px'
+          break
+
+        default:
+          htmlElement.style.maxHeight = '360px'
+          break
+      }
+    }
+  }
+
+  highlightCodeLine(line: number, topMargin: number) {
+    let lineHighlight = document.getElementById('highlighted')
+    const preElement = document.getElementById('code-block')
+
+    if (!lineHighlight) {
+      lineHighlight = document.createElement('div')
+      lineHighlight.id = 'highlighted'
+      lineHighlight.className = 'line-highlight'
+      lineHighlight.setAttribute('aria-hidden', 'true')
+      lineHighlight.style.height = '26px'
+
+      preElement?.appendChild(lineHighlight)
+    }
+
+    lineHighlight.style.top = `${line * 25.5 + topMargin}px`
+  }
+
+  async markLine(line: number, delay?: number) {
+    this.highlightCodeLine(line, 4)
+    if (delay) await this.addDelay(delay)
+  }
+
   addCallToStack(row: number, col: number) {
     const NofQueensElement = document.getElementById(
       'set-queen-number'
@@ -31,10 +84,7 @@ class Board {
 
     const functionCall = document.createElement('div')
     functionCall.id = this.getIdFromMatrixCoords(row || 0, col || 0)
-    functionCall.style.width = 'auto'
-    functionCall.style.height = '60px'
-    functionCall.style.background = 'yellow'
-    functionCall.classList.add('flex-shrink-0')
+    functionCall.classList.add('stack-item')
     functionCall.textContent = `Solver(${row}), row: ${row || ''}, col: ${
       col || ''
     }`
@@ -49,27 +99,7 @@ class Board {
         functionCall.classList.add('fade-in')
       })
 
-      switch (selectedQueenNumber) {
-        case 8:
-          stackElement.style.maxHeight = '630px'
-          break
-
-        case 7:
-          stackElement.style.maxHeight = '560px'
-          break
-
-        case 6:
-          stackElement.style.maxHeight = '490px'
-          break
-
-        case 5:
-          stackElement.style.maxHeight = '440px'
-          break
-
-        default:
-          stackElement.style.maxHeight = '360px'
-          break
-      }
+      this.setElementHeightBasedOnBoardSize(stackElement, selectedQueenNumber)
     }
   }
 
@@ -97,27 +127,31 @@ class Board {
     solveButton.style.cursor = 'not-allowed'
     solveButton.classList.add('cursor-not-allowed', 'opacity-50')
 
+    await this.markLine(1, this.delay)
     if (row === this.columns) {
       this.solutions.push(this.boardMatrix.map((row) => [...row]))
       this.solutionFound = true
 
+      await this.markLine(3, this.delay / 2)
       return
     }
 
     for (let col = 0; col < this.columns; col++) {
-      const squareId = `${this.boardLetters[col]}${Math.abs(
-        row - this.columns
-      )}`
+      await this.markLine(6, this.delay / 2)
+      const squareId = this.getIdFromMatrixCoords(
+        Math.abs(row + 1 - this.columns),
+        col
+      )
       const square = document.getElementById(squareId)
 
+      await this.markLine(11)
       if (this.isValidSquare(squareId)) {
         await this.addDelay(this.delay / 3)
-
         square?.classList.add('highlightGreen')
         this.boardMatrix[row][col] = 'Q'
         const queenImage = this.createQueenImage('./q.png')
 
-        if (this.delay > 0) await this.addDelay(this.delay)
+        if (this.delay > 0) await this.addDelay(this.delay / 2)
         square?.classList.remove('highlightGreen')
 
         square?.appendChild(queenImage)
@@ -126,17 +160,21 @@ class Board {
 
         if (this.delay > 0) await this.addDelay(this.delay)
 
+        await this.markLine(13, this.delay / 3)
         await this.solver(row + 1)
 
+        await this.markLine(15, this.delay / 2)
         if (this.solutionFound) {
           const lastElement = stack?.lastElementChild as HTMLElement
           lastElement.classList.add('fade-out')
           stack?.removeChild(lastElement)
           if (this.delay > 0) await this.addDelay(this.delay / 2)
 
+          await this.markLine(16, this.delay / 3)
           return
         }
 
+        await this.markLine(19, this.delay)
         this.boardMatrix[row][col] = '' // Backtrack
 
         if (this.delay > 0) await this.addDelay(this.delay / 2)
