@@ -1,6 +1,6 @@
 # backtracking N Queens
 
-This was made as part of a talk I gave at [Remotecoders](remotecoders.org), which is meant to aid in explaining how backtracking algorithms work by using a step by step approach for the N Queens problem.
+This was made as part of a talk I gave at [Remotecoders](www.remotecoders.org), which is meant to aid in explaining how backtracking algorithms work by using a step by step approach for the N Queens problem.
 
 Install packages: 
 ```bash
