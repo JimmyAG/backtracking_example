@@ -1,3 +1,4 @@
+"use strict";
 class Board {
     //constructor function
     constructor(delay, rows) {
@@ -422,5 +423,4 @@ solveButton === null || solveButton === void 0 ? void 0 : solveButton.addEventLi
         console.log(gameClass.boardMatrix);
     }
 });
-export {};
 //# sourceMappingURL=main.js.map
