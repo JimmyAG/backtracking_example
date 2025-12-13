@@ -1,0 +1,25 @@
+pre[data-line] {
+  position: relative;
+  padding: 1em 0 1em 3em;
+}
+
+/* Highlighted Line */
+.line-highlight {
+  position: absolute;
+  left: 0;
+  right: 0;
+  padding: 0;
+  margin-top: 14px;
+  background: rgba(255, 223, 186, 0.3);
+  background: linear-gradient(
+    to right,
+    rgba(255, 223, 186, 0.4) 70%,
+    rgba(255, 223, 186, 0)
+  );
+  pointer-events: none;
+  line-height: inherit;
+  white-space: pre;
+  border-left: 5px solid #ffb347;
+  border-radius: 2px;
+  height: 25px !important;
+}
