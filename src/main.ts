@@ -1,5 +1,3 @@
-import { im } from './im'
-
 class Board {
   private readonly columns: number
   private readonly boardLetters: string[]
