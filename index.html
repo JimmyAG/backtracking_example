@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Backtracking - N queens</title>
+    <link
+      href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link href="./globals.css" rel="stylesheet" />
+    <link href="./code-styles.css" rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css"
+    />
+    <link href="./code-line-highlight.css" rel="stylesheet" />
+  </head>
+  <body>
+    <h1 class="text-3xl font-bold mt-2 ml-2">
+      Hello,
+      <span class="text-red-700"> &#123; </span>
+      <span class="text-green-600">Remotecoders</span>
+      <span class="text-red-700"> &#125; </span>
+      !
+    </h1>
+
+    <!-- Main container -->
+    <div class="flex flex-col my-4 mx-4">
+      <!-- Flex container for Chess board and Stack -->
+      <div class="flex gap-3">
+        <!-- Chess board -->
+        <div class="chess-panel flex flex-col border rounded-md p-3 w-full">
+          <div class="flex gap-5">
+            <div class="flex items-center gap-5">
+              <div id="stock-area" class="flex gap-2 w-48 flex-col">
+                <div class="flex flex-row gap-3">
+                  <label for="free-play">Free play</label>
+                  <input
+                    class="mt-1"
+                    id="free-play"
+                    type="checkbox"
+                    aria-label="free-play"
+                  />
+                </div>
+                <div class="flex flex-row gap-3">
+                  <p class="mt-2">Remaining Queens:</p>
+                  <span class="mt-4" id="stock">??</span>
+                  <img
+                    id="draggable-queen"
+                    class="queen-image"
+                    draggable="true"
+                    src="./q.png"
+                  />
+                </div>
+              </div>
+              <div class="flex flex-col gap-2">
+                <div class="flex justify-between gap-2">
+                  <label for="delay">Delay in ms:</label>
+                  <input
+                    id="delay"
+                    class="w-16 border py-1 pl-2 pr-1 rounded-md"
+                    type="number"
+                    value="1000"
+                    max="5000"
+                  />
+                </div>
+                <div class="flex justify-between gap-2">
+                  <label for="set-queen-number">Number of queens:</label>
+                  <input
+                    class="w-12 border py-1 pl-2 pr-1 rounded-md"
+                    id="set-queen-number"
+                    type="number"
+                    min="4"
+                    max="8"
+                    value="4"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="flex flex-col gap-2">
+              <button
+                class="border rounded-md p-2 w-24 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 transition-all"
+                id="start-button"
+              >
+                Start
+              </button>
+              <button
+                class="border rounded-md p-2 w-24 bg-gray-100 cursor-not-allowed opacity-50"
+                disabled
+                id="solve-button"
+              >
+                Solve
+              </button>
+            </div>
+          </div>
+          <div id="chess-board" class="mt-3 w-fit"></div>
+        </div>
+
+        <!-- Stack -->
+        <div class="stack-panel">
+          Stack
+          <div
+            id="stack"
+            class="flex flex-col-reverse gap-2 overflow-y-auto pt-2"
+          ></div>
+        </div>
+
+        <!-- Code -->
+        <div class="code-panel flex flex-col border rounded-md p-3 gap-2">
+          Code
+          <div
+            id="code"
+            class="relative flex flex-col-reverse gap-2 overflow-y-auto"
+          >
+            <pre
+              id="code-block"
+              class="line-numbers"
+              data-line=""
+            ><code class="language-typescript">async solver(row: number) {
+  if (row === this.columns) {
+    this.solutionFound = true;
+    return;
+  }
+
+  for (let col = 0; col &lt; this.columns; col++) {
+    const squareId = this.getIdFromMatrixCoords(
+        Math.abs(row + 1 - this.columns),
+        col)
+
+    if (this.isValidSquare(squareId)) {
+      this.boardMatrix[row][col] = 'Q';
+      await this.solver(row + 1);
+
+      if (this.solutionFound) {
+        return;
+      }
+
+      this.boardMatrix[row][col] = ''; // Backtrack
+    }
+  }
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="../dist/main.js" type="module"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/components/prism-typescript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-highlight/prism-line-highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+    <script src="_bundle.js"></script>
+  </body>
+</html>
